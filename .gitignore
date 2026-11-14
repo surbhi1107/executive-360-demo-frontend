@@ -1,0 +1,8 @@
+node_modules/
+frontend/dist/
+backend/.env
+backend/instance/
+*.log
+.DS_Store
+.idea/
+.vscode/
