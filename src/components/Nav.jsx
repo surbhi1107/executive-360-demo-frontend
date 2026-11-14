@@ -1,4 +1,5 @@
-import { ChartColumn, ChartGantt, MessageSquare, Newspaper, Settings } from 'lucide-react'
+import { ChartColumn, ChartGantt, LogOut, MessageSquare, Newspaper, Settings } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
 import { VIEWS, useNav } from '../context/NavContext'
 import { cx } from './ui'
 
@@ -22,6 +23,7 @@ function NavButton({ id, label, tab }) {
 
 /** 220px sidebar on desktop */
 export function Sidebar() {
+  const { logout } = useAuth()
   return (
     <nav aria-label="Main" className="sticky top-0 box-border flex h-screen flex-col gap-0.5 bg-surface px-3 py-6 max-[760px]:hidden">
       <div className="px-3 pb-6 text-15 font-semibold leading-5">
@@ -34,6 +36,10 @@ export function Sidebar() {
           <span className="grid size-7 flex-none place-items-center rounded-full bg-accent text-13 font-semibold text-on-accent">A</span>
           <span>Anita Rao<br /><span className="text-mute">CEO</span></span>
         </div>
+        <button type="button" onClick={logout}
+          className="flex cursor-pointer items-center gap-2 rounded-sm border-0 bg-transparent px-0 py-1 text-left text-13 text-mute hover:text-ink">
+          <LogOut size={15} strokeWidth={1.6} aria-hidden="true" /> Sign out
+        </button>
         <div className="text-12 text-mute">Projects: live data<br />Other modules: sample</div>
       </div>
     </nav>

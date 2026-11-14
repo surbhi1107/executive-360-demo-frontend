@@ -1,3 +1,4 @@
+import { AuthProvider, useAuth } from './context/AuthContext'
 import { AskProvider } from './context/AskContext'
 import { DataProvider } from './context/DataContext'
 import { NavProvider, useNav } from './context/NavContext'
@@ -9,6 +10,7 @@ import { AskView } from './views/Ask'
 import { Brief } from './views/Brief'
 import { Projects } from './views/Projects'
 import { Reports } from './views/Reports'
+import { Login } from './views/Login'
 import { Settings } from './views/Settings'
 
 const VIEW = { brief: Brief, ask: AskView, projects: Projects, reports: Reports, settings: Settings }
@@ -30,18 +32,29 @@ function Shell() {
   )
 }
 
+/** Providers that fetch data mount only after sign-in, so nothing is requested from the API before that. */
+function Gate() {
+  const { authed } = useAuth()
+  if (!authed) return <Login />
+  return (
+    <NavProvider>
+      <DataProvider>
+        <SheetProvider>
+          <AskProvider>
+            <Shell />
+          </AskProvider>
+        </SheetProvider>
+      </DataProvider>
+    </NavProvider>
+  )
+}
+
 export default function App() {
   return (
     <ThemeProvider>
-      <NavProvider>
-        <DataProvider>
-          <SheetProvider>
-            <AskProvider>
-              <Shell />
-            </AskProvider>
-          </SheetProvider>
-        </DataProvider>
-      </NavProvider>
+      <AuthProvider>
+        <Gate />
+      </AuthProvider>
     </ThemeProvider>
   )
 }
