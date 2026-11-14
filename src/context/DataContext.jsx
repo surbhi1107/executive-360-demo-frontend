@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { api } from '../lib/api'
+import { API_BASE, api } from '../lib/api'
 import { readStore, writeStore } from '../lib/format'
 import { SRC } from '../data/sample'
 
@@ -7,7 +7,7 @@ const Ctx = createContext(null)
 export const useData = () => useContext(Ctx)
 
 const BLANK = { mode: null, done: null }
-const fileUrl = (name) => '/files/agreements/' + encodeURIComponent(name)
+const fileUrl = (name) => API_BASE + '/files/agreements/' + encodeURIComponent(name)
 
 export function DataProvider({ children }) {
   const [data, setData] = useState(null)
@@ -35,7 +35,7 @@ export function DataProvider({ children }) {
     const s = { ...SRC }
     if (data) {
       const S = data.sources
-      s.workbook = { k: 'excel', name: S.workbook.name, when: 'Edited ' + S.workbook.modified + ' · loaded ' + S.workbook.loaded, group: 'Project data', url: '/files/workbook' }
+      s.workbook = { k: 'excel', name: S.workbook.name, when: 'Edited ' + S.workbook.modified + ' · loaded ' + S.workbook.loaded, group: 'Project data', url: API_BASE + '/files/workbook' }
       for (const a of S.agreements) s['doc:' + a.ref] = { k: 'word', name: a.name, when: 'Signed agreement', group: 'Project agreements', url: fileUrl(a.name) }
     }
     return s
