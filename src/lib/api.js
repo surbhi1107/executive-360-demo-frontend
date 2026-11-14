@@ -4,7 +4,7 @@ export const API_BASE = (import.meta.env.VITE_API_BASE || '').replace(
   /\/$/,
   '',
 );
-
+console.log('API_BASE', API_BASE);
 /** Tiny fetch wrapper for the Node API. Throws Error(message) with the server's `error` text when there is one. */
 export async function api(path, body) {
   const opt = body
