@@ -13,6 +13,7 @@ export default {
         sep: v('separator'), ctl: v('control-border'),
         accent: v('accent'), 'on-accent': v('on-accent'), 'accent-soft': v('accent-soft'),
         positive: v('positive'), caution: v('caution'), critical: v('critical'),
+        'viz-1': v('viz-1'), 'viz-2': v('viz-2'), 'viz-axis': v('viz-axis'), 'viz-bad': v('viz-bad'), 'viz-warn': v('viz-warn'), 'viz-good': v('viz-good'),
         'chart-line': v('chart-line'), 'chart-area': v('chart-area'), scrim: v('scrim'),
       },
       boxShadow: { card: v('shadow-card'), raised: v('shadow-raised') },

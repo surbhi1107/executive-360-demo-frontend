@@ -43,7 +43,7 @@ export function AskProvider({ children }) {
       const r = await api('/api/ask', { question: q, history: history.current.slice(-3) })
       history.current.push({ q, a: (r.hero ? decode(r.hero) + '. ' : '') + plain(r.body) })
       if (r.sources.some((s) => s.kind === 'calc')) registerCalc()
-      patch(id, { status: 'answer', answer: { hero: r.hero, body: r.body, list: r.list && r.list.length ? r.list : null, src: r.sources.map(citeFrom), f: r.followups || [], live: true } })
+      patch(id, { status: 'answer', answer: { hero: r.hero, body: r.body, list: r.list && r.list.length ? r.list : null, chart: r.chart || null, src: r.sources.map(citeFrom), f: r.followups || [], live: true } })
     } catch (err) {
       patch(id, { status: 'error', err: err.message })
       setBusyBoth(false)

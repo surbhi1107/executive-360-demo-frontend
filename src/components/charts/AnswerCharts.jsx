@@ -1,4 +1,7 @@
-/** Charts shown under answers. Plain SVG, themed through Tailwind fill/stroke utilities. */
+/** Charts shown under answers. Live answers send a typed chart (see AskChart.jsx); the sample answers use the
+ *  two small SVG charts below. Plain SVG, themed through Tailwind fill/stroke utilities. */
+import { AskChart } from './AskChart'
+
 const TXT = 'fill-mute text-12'
 
 export function BarsChart({ rows, unit }) {
@@ -54,5 +57,6 @@ export function LineChart({ labels, vals, fmt }) {
 
 export function AnswerChart({ chart }) {
   if (!chart) return null
+  if (chart.type) return <AskChart chart={chart} />
   return chart.kind === 'bars' ? <BarsChart rows={chart.rows} unit={chart.unit} /> : <LineChart labels={chart.labels} vals={chart.vals} fmt={chart.fmt} />
 }
