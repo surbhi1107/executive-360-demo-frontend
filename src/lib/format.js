@@ -24,9 +24,11 @@ export const STAGE_NAME = {
   testing: 'Testing and commissioning', handover: 'Certification and handover',
 }
 
-export const FTYPE = {
-  sla: 'SLA / penalty risk', forecast: 'Will miss milestone', missed: 'Milestone missed',
-  stale: 'Data not updated', budget: 'Budget running ahead',
+/** "14 Nov, 10:30" from an ISO date-time such as 2026-11-14T10:30:00 */
+export const whenShort = (iso) => {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return iso || ''
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 }
 
 export const prefersReducedMotion = () =>

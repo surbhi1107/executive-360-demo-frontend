@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useMemo, useRef, useState } fro
 const Ctx = createContext(null)
 export const useSheet = () => useContext(Ctx)
 
-/** Slide-over sheet with a back stack. Items: {type:'attn', a} | {type:'cite', c} | {type:'sources'} */
+/** Slide-over sheet with a back stack. Items: {type:'cite', c} | {type:'sources'} */
 export function SheetProvider({ children }) {
   const [stack, setStack] = useState([])
   const lastFocus = useRef(null)
@@ -24,7 +24,6 @@ export function SheetProvider({ children }) {
 
   const value = useMemo(() => ({
     stack, isOpen, push, back, close,
-    openAttn: (a) => push({ type: 'attn', a }),
     openCite: (c) => push({ type: 'cite', c }),
     openAllSources: () => push({ type: 'sources' }),
   }), [stack, isOpen, push, back, close])

@@ -21,6 +21,7 @@ export function GanttLegend() {
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-12 text-mute">
       <span className={item}><i className="inline-block h-2 w-7 rounded bg-[linear-gradient(90deg,var(--chart-line)_60%,var(--fill)_60%)] shadow-[inset_0_0_0_1px_var(--separator)]" />Plan, dark part done</span>
       <span className={item}><i className="inline-block h-2 w-7 rounded bg-fill shadow-[inset_0_0_0_1.5px_var(--caution)]" />Past its plan end, not finished</span>
+      <span className={item}><i className="box-border inline-block size-[9px] rounded-full border-2 border-accent" />Internal target</span>
       <span className={item}><i className="box-border inline-block size-[9px] rotate-45 border-[1.5px] border-mute" />Contract date</span>
       <span className={item}><i className="inline-block size-[9px] rotate-45 bg-ink" />Revised target</span>
       <span className={item}><i className="inline-block size-2.5 rounded-full bg-critical" />Forecast</span>
@@ -38,7 +39,7 @@ export function Gantt({ p, today, w0 }) {
   let s = Infinity, e = -Infinity
   for (const ph of p.phases) {
     s = Math.min(s, wpos(D(ph.start)))
-    for (const d of [ph.end, ph.contract, ph.revised, ph.forecast]) e = Math.max(e, wpos(D(d)) + 1)
+    for (const d of [ph.end, ph.contract, ph.revised, ph.forecast, ph.internal]) e = Math.max(e, wpos(D(d)) + 1)
   }
   e = Math.max(e, wpos(today) + 2)
   s = Math.max(0, Math.floor(s) - 2); e = Math.ceil(e) + 3
@@ -93,6 +94,7 @@ export function Gantt({ p, today, w0 }) {
                     title={`${ph.name}: plan ${fmtD(D(ph.start))} to ${fmtD(D(ph.end))} · ${ph.ac}% done, about ${planPct}% expected by today`}>
                     <i className="absolute inset-y-0 left-0 bg-chart-line" style={{ width: `${ph.ac}%` }} />
                   </span>
+                  <span className={cx(MARK, 'z-[1] box-border size-[9px] rounded-full border-2 border-accent bg-surface')} style={{ left: `${x(wpos(D(ph.internal)))}px` }} title={'Internal target ' + fmtD(D(ph.internal))} />
                   <span className={cx(MARK, 'z-[1] box-border size-2.5 rotate-45 border-[1.5px] border-mute bg-surface')} style={{ left: `${x(wpos(D(ph.contract)))}px` }} title={'Contract date ' + fmtD(D(ph.contract))} />
                   {ph.revised !== ph.contract && <span className={cx(MARK, 'z-[1] box-border size-2.5 rotate-45 bg-ink shadow-[0_0_0_2px_var(--surface)]')} style={{ left: `${x(wpos(D(ph.revised)))}px` }} title={'Revised target ' + fmtD(D(ph.revised))} />}
                   <span className={cx(MARK, 'z-[1] box-content size-3 rounded-full border-2 border-surface', MK_BG[ph.status])} style={{ left: `${x(wpos(D(ph.forecast)))}px` }} title={'Forecast ' + fmtD(D(ph.forecast))} />

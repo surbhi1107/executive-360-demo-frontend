@@ -7,13 +7,14 @@ import { ThemeProvider } from './context/ThemeContext'
 import { Sidebar, TabBar } from './components/Nav'
 import { Sheet } from './components/Sheet'
 import { AskView } from './views/Ask'
-import { Brief } from './views/Brief'
-import { Projects } from './views/Projects'
-import { Reports } from './views/Reports'
+import { Dept } from './views/Dept'
+import { Followups } from './views/Followups'
+import { Home } from './views/Home'
+import { isDept } from './lib/kinds'
 import { Login } from './views/Login'
 import { Settings } from './views/Settings'
 
-const VIEW = { brief: Brief, ask: AskView, projects: Projects, reports: Reports, settings: Settings }
+const VIEW = { home: Home, ask: AskView, followups: Followups, settings: Settings }
 
 function Shell() {
   const { view } = useNav()
@@ -24,6 +25,7 @@ function Shell() {
         <main className="min-w-0 pb-24 pl-[max(3rem,env(safe-area-inset-left,0px))] pr-[max(3rem,env(safe-area-inset-right,0px))] pt-12 max-[760px]:pb-[120px] max-[760px]:pl-[max(16px,env(safe-area-inset-left,0px))] max-[760px]:pr-[max(16px,env(safe-area-inset-right,0px))] max-[760px]:pt-6">
           {/* every view stays mounted (hidden when inactive) so threads, typing and flag panels survive navigation */}
           {Object.entries(VIEW).map(([id, View]) => <div key={id} hidden={view !== id}><View /></div>)}
+          {isDept(view) && <Dept key={view} id={view} />}
         </main>
       </div>
       <TabBar />

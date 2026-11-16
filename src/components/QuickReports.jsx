@@ -6,10 +6,10 @@ import { LinkBtn, cx } from './ui'
 
 export function QuickReports() {
   const { qr, setQr, resetQr, ask } = useAsk()
-  const { data } = useData()
+  const { deptById } = useData()
   const [editing, setEditing] = useState(false)
-  // the Project health tile always shows the live count
-  const value = (r) => (r.id === 'proj' && data ? `${data.summary.at_risk} at risk` : r.v)
+  const value = (r) => { const d = r.dept && deptById(r.dept); return d && r.kpi != null ? d.kpis[r.kpi]?.value : (r.v || (d ? d.status_word : '')) }
+  const where = (r) => (r.dept && deptById(r.dept) ? deptById(r.dept).name : 'All departments')
 
   return (
     <aside aria-label="Quick reports"
@@ -24,11 +24,11 @@ export function QuickReports() {
           {qr.map((r, i) => (
             <li key={r.id} className={cx('relative flex items-center gap-2 max-[1000px]:w-[200px] max-[1000px]:flex-none',
               i > 0 && "before:absolute before:inset-x-2 before:top-0 before:border-t before:border-sep before:content-[''] max-[1000px]:before:hidden")}>
-              <button type="button" onClick={() => { if (!editing) ask(r.q, r) }}
+              <button type="button" onClick={() => { if (!editing) ask(r.q, { rep: r, dept: r.dept }) }}
                 className="group flex min-w-0 flex-1 cursor-pointer flex-col gap-0.5 rounded-sm border-0 bg-transparent px-2 py-2.5 text-left hover:bg-fill max-[1000px]:bg-fill">
                 <span className="overflow-hidden text-ellipsis whitespace-nowrap text-14 font-semibold leading-[19px]">{r.name}</span>
                 <span className="flex justify-between gap-2 text-12 text-mute group-hover:text-ink max-[1000px]:text-ink">
-                  <span>{r.cadence}</span><span className="whitespace-nowrap font-semibold tabular-nums text-ink">{value(r)}</span>
+                  <span>{where(r)} · {r.cadence}</span><span className="whitespace-nowrap font-semibold tabular-nums text-ink">{value(r)}</span>
                 </span>
               </button>
               {editing && (

@@ -1,5 +1,5 @@
 /* Small UI kit used across the app (Tailwind classes only). */
-import { KINDS } from '../../data/sample'
+import { KINDS } from '../../lib/kinds'
 
 export const cx = (...a) => a.filter(Boolean).join(' ')
 
@@ -87,3 +87,28 @@ export function KV({ k, children }) {
     </div>
   )
 }
+
+/** The small typing indicator shown while an agent is writing */
+export function Typing({ label = 'Thinking', className }) {
+  return (
+    <span className={cx('inline-flex gap-1 py-3', className)} aria-label={label}>
+      {[0, 1, 2].map((i) => <i key={i} className="size-1.5 animate-blink rounded-full bg-mute" style={{ animationDelay: `${i * 0.15}s` }} />)}
+    </span>
+  )
+}
+
+/** Section heading with a right-hand sub line */
+export function SecHead({ title, sub, className }) {
+  return (
+    <div className={cx('flex flex-wrap items-baseline justify-between gap-3', className)}>
+      <Title2>{title}</Title2>
+      {sub != null && <Subhead className="mt-0">{sub}</Subhead>}
+    </div>
+  )
+}
+
+/** Small coloured tag for "Quick report", agent names… */
+export const Tag = ({ className, ...p }) => <span className={cx('rounded-[5px] bg-accent-soft px-1.5 py-px text-12 font-semibold text-accent', className)} {...p} />
+
+export const Field = ({ className, ...p }) => <input className={cx('box-border rounded-sm border border-ctl bg-surface px-2.5 py-2 text-14 leading-5 text-ink', className)} {...p} />
+export const TextArea = ({ className, ...p }) => <textarea className={cx('box-border w-full rounded-sm border border-ctl bg-surface px-2.5 py-2 text-14 leading-5 text-ink', className)} {...p} />

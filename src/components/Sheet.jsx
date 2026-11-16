@@ -1,39 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { ChevronLeft, X } from 'lucide-react'
-import { KINDS } from '../data/sample'
-import { useAsk } from '../context/AskContext'
+import { KINDS } from '../lib/kinds'
 import { useData } from '../context/DataContext'
-import { useNav } from '../context/NavContext'
 import { useSheet } from '../context/SheetContext'
-import { SourceChips } from './SourceChips'
 import { SourcePreview } from './SourcePreview'
-import { Btn, BtnOutline, KV, KindTag, Status, cx } from './ui'
+import { Btn, KV, KindTag, cx } from './ui'
 
 const H2 = 'text-22 font-semibold tracking-[-0.01em] [text-wrap:balance]'
 
-function AttnSheet({ a, close }) {
-  const { ask } = useAsk()
-  const { openProject } = useNav()
-  return (
-    <>
-      <Status s={a.s}>{a.w}</Status>
-      <h2 id="sheetTitle" className={H2}>{a.t}</h2>
-      <KV k="Owner"><span>{a.o}</span></KV>
-      <KV k="What happened"><span>{a.what}</span></KV>
-      <KV k="Decision needed"><span>{a.decision}</span></KV>
-      <KV k="Based on"><SourceChips cites={a.cites} label={false} /></KV>
-      <div className="flex flex-wrap gap-2">
-        <Btn onClick={() => { close(); ask(a.q) }}>Ask about this</Btn>
-        {a.proj && <BtnOutline onClick={() => { close(); openProject(a.proj) }}>Open project</BtnOutline>}
-      </div>
-    </>
-  )
-}
-
 function CiteSheet({ c }) {
   const { S } = c, K = KINDS[S.k]
-  const [note, setNote] = useState(false)
-  const label = S.url ? 'Download ' + K[1] + ' file' : ['image', 'video', 'gif', 'text'].includes(S.k) ? 'Open original' : 'Open in ' + K[1]
   return (
     <>
       <div className="flex items-center gap-3">
@@ -41,13 +17,10 @@ function CiteSheet({ c }) {
         <div><div className="text-12 font-medium text-mute">{K[1]}</div><h2 id="sheetTitle" className="text-18 font-semibold tracking-[-0.01em] [text-wrap:balance]">{S.name}</h2></div>
       </div>
       <KV k="Where in the source"><span>{c.loc}</span></KV>
-      <KV k="Used for"><span>{c.used}</span></KV>
+      {c.used && <KV k="Used for"><span>{c.used}</span></KV>}
       <SourcePreview pv={c.pv} />
-      <KV k="Freshness">
-        <span>{S.when}{S.stale && <>&nbsp; <Status s="watch">{S.stale}</Status></>}</span>
-      </KV>
-      {S.k !== 'calc' && <Btn onClick={() => (S.url ? window.open(S.url, '_blank') : setNote(true))}>{label}</Btn>}
-      {note && <p className="text-12 text-mute">Sample source: in the full product this opens the original at this exact location.</p>}
+      <KV k="Freshness"><span>{S.when}</span></KV>
+      {S.url && <Btn onClick={() => window.open(S.url, '_blank')}>Download {K[1]} file</Btn>}
     </>
   )
 }
@@ -57,11 +30,10 @@ function AllSourcesSheet() {
   const groups = {}
   Object.values(sources).forEach((S) => (groups[S.group] ||= []).push(S))
   const total = Object.keys(sources).length
-  const up = Object.values(sources).filter((S) => !S.stale).length
   return (
     <>
       <h2 id="sheetTitle" className={H2}>Sources</h2>
-      <p className="-mt-3 text-mute">{up} of {total} up to date. Every number on the Brief and in Ask comes from one of these.</p>
+      <p className="-mt-3 text-mute">Every number on the dashboard and in every answer comes from one of these {total} files.</p>
       {Object.entries(groups).map(([g, list]) => (
         <div key={g} className="flex flex-col">
           <h3 className="mb-1 text-12 font-semibold text-mute">{g}</h3>
@@ -72,7 +44,7 @@ function AllSourcesSheet() {
                 <div className="text-14 font-semibold [overflow-wrap:anywhere]">{S.name}</div>
                 <div className="text-12 text-mute">{KINDS[S.k][1]} · {S.when}</div>
               </div>
-              {S.stale ? <Status s="watch">Stale</Status> : <Status s="ok">Current</Status>}
+              {S.url && <a className="text-13 text-accent hover:underline" href={S.url}>Download</a>}
             </div>
           ))}
         </div>
@@ -118,7 +90,6 @@ export function Sheet() {
             className="grid size-8 cursor-pointer place-items-center rounded-full border-0 bg-fill"><X size={18} aria-hidden="true" /></button>
         </div>
         <div className="flex flex-col gap-6">
-          {top?.type === 'attn' && <AttnSheet a={top.a} close={close} />}
           {top?.type === 'cite' && <CiteSheet key={stack.length + top.c.loc} c={top.c} />}
           {top?.type === 'sources' && <AllSourcesSheet />}
         </div>
