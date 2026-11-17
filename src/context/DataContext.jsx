@@ -44,6 +44,16 @@ export function DataProvider({ children }) {
   }, [setCases, loadBrief, loadLinks])
 
   useEffect(() => { load() }, [load])
+
+  // While the dashboard is open, look for new email replies every 30 seconds (and when the tab comes back into view).
+  const mailReady = cs.mail.ready
+  useEffect(() => {
+    if (!mailReady) return undefined
+    const check = () => { if (!document.hidden) api('/api/cases/check', {}).then(setCases).catch(() => {}) }
+    const timer = setInterval(check, 30000)
+    document.addEventListener('visibilitychange', check)
+    return () => { clearInterval(timer); document.removeEventListener('visibilitychange', check) }
+  }, [mailReady, setCases])
   const reload = useCallback(() => { setData(null); setLoadErr(null); load(true) }, [load])
 
   /* ---- sources ---- */

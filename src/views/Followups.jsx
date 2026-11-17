@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useData } from '../context/DataContext'
+import { useNav } from '../context/NavContext'
 import { api } from '../lib/api'
 import { whenShort } from '../lib/format'
 import { Btn, BtnOutline, Card, LinkBtn, PageHead, Status, TextArea, Title2, cx } from '../components/ui'
@@ -67,6 +68,16 @@ export function Followups() {
   const { cases, mail, ladder, clock } = cs
   const [busy, setBusy] = useState(false)
   const [done, setDone] = useState(null)
+  const { view } = useNav()
+
+  // While this page is open, pick up replies the server has saved from email
+  useEffect(() => {
+    if (view !== 'followups') return undefined
+    const load = () => api('/api/cases').then(setCases).catch(() => {})
+    load()
+    const t = setInterval(load, 20000)
+    return () => clearInterval(t)
+  }, [view, setCases])
 
   const post = async (path, body) => {
     setBusy(true)
