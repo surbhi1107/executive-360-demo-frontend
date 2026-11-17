@@ -10,10 +10,18 @@ const EV_DOT = { reply: 'bg-positive', ceo: 'bg-critical', suggest: 'bg-critical
 
 function CaseCard({ c, busy, post }) {
   const { deptById, flags, openFlag } = useData()
-  const [reply, setReply] = useState(null) // null = closed, string = the text being typed
+  const [reply, setReply] = useState(null) // null = closed, string = the email being written
+  const [writing, setWriting] = useState(false) // the AI is drafting
   const d = deptById(c.dept)
   const flag = flags.find((f) => f.id === c.flag_id)
   const dd = 'm-0'
+  // Open the box with a draft the AI has written from the whole conversation
+  const openReply = async () => {
+    if (reply !== null) { setReply(null); return }
+    setWriting(true)
+    try { setReply((await api(`/api/cases/${c.id}/draft`, {})).body) } catch (e) { setReply('') }
+    setWriting(false)
+  }
   return (
     <Card className="flex flex-col gap-3" data-case={c.id}>
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -30,18 +38,16 @@ function CaseCard({ c, busy, post }) {
       {c.open && (
         <>
           <div className="flex flex-wrap items-center gap-2">
-            <BtnOutline disabled={busy} onClick={() => post(`/api/cases/${c.id}/action`, { action: 'remind' })}>Send reminder</BtnOutline>
-            {c.manager && <BtnOutline disabled={busy} onClick={() => post(`/api/cases/${c.id}/action`, { action: 'escalate' })}>Escalate to {c.manager}</BtnOutline>}
+            <BtnOutline disabled={busy || writing} onClick={openReply}>{writing ? 'Writing a draft…' : 'Reply'}</BtnOutline>
             {c.auto_allowed && <BtnOutline disabled={busy} onClick={() => post(`/api/cases/${c.id}/action`, { action: c.auto ? 'auto_off' : 'auto_on' })}>{c.auto ? 'Turn automatic follow-up off' : 'Follow up automatically'}</BtnOutline>}
-            <BtnOutline onClick={() => setReply(reply === null ? '' : null)}>Record a reply</BtnOutline>
             <LinkBtn className="text-13" onClick={() => post(`/api/cases/${c.id}/action`, { action: 'close' })}>Close case</LinkBtn>
           </div>
           {reply !== null && (
             <div className="flex flex-col gap-2">
-              <TextArea aria-label={`Reply from ${c.owner}`} className="min-h-20" autoFocus value={reply} onChange={(e) => setReply(e.target.value)}
-                placeholder={`Paste or type what ${c.owner} said, for example after a phone call. The AI will summarise it.`} />
+              <TextArea aria-label={`Email to ${c.owner}`} className="min-h-40" autoFocus value={reply} onChange={(e) => setReply(e.target.value)} />
+              <p className="m-0 text-12 text-mute">Suggested by AI from everything said on this case. Edit it if you like. It goes to {c.owner} in the same email chain.</p>
               <div className="flex gap-2">
-                <Btn small disabled={busy || !reply.trim()} onClick={async () => { await post(`/api/cases/${c.id}/reply`, { text: reply.trim() }); setReply(null) }}>Save reply</Btn>
+                <Btn small disabled={busy || !reply.trim()} onClick={async () => { await post(`/api/cases/${c.id}/send`, { body: reply.trim() }); setReply(null) }}>Send reply</Btn>
                 <BtnOutline onClick={() => setReply(null)}>Cancel</BtnOutline>
               </div>
             </div>
